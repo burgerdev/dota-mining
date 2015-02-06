@@ -55,3 +55,6 @@ target/
 
 # security
 dotamining.conf
+
+# database
+*.sqlite

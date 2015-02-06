@@ -8,6 +8,10 @@ import urllib
 
 from data import Match
 
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
 
 class Client(object):
     apiurl = "https://api.steampowered.com"
@@ -38,9 +42,14 @@ class Client(object):
         # TODO realize as iterator
         matches = []
         for matchDict in d['result']['matches']:
-            match = Match(client=self)
-            match.fromJSON(matchDict)
-            matches.append(match)
+            try:
+                match = Match.fromJSON(matchDict)
+                if match is not None:
+                    matches.append(match)
+            except Exception as e:
+                print(e)
+                logger.warn("Skipped result")
+                raise
         return matches
 
     def getMatchDetails(self, *args, **kwargs):
@@ -54,7 +63,6 @@ class Client(object):
         f = urllib.urlopen(url)
         d = json.load(f)
 
-        match.fromJSON(d["result"])
         match.detailsFromJSON(d["result"])
 
         return match
